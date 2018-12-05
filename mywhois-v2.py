@@ -225,6 +225,7 @@ def main(argv):
 	path = dir0 + '/out2/'
 	str1 = dir0 + '/out2/' + file + '_succeed'
 	fail_list = dir0 + '/out2/' + file  + '_retry'
+	log = dir0 + '/out2/' + file + '.log'
 	#combine the result files
 	
 	print("\n-----combining the results now...-----")
@@ -253,6 +254,8 @@ def main(argv):
 	cost2 = time_end - time_start
 	print("\nfile:{}, Total lines:{}".format(file, total_lines))
 	print("\nV2:Total time used to query and save: {}, combine:{}".format(cost1,cost2))
+    with open(log, 'w') as flog:
+    	flog.write("\nmywhois-V2: file {}, total lines {}, query time: {} s, combine time: {} s".format(file, total_lines, cost1, cost2))
 	Clear_helper()
 
 

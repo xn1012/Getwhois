@@ -27,9 +27,9 @@ def Worker(i,file):
 	domains_failed = {}
 
 	global q
-	dir = os.getcwd()
-	str1 = dir + "/out1/" + file + "_succeed_" + str(i)
-	fail_list = dir + '/out1/' + file + "_retry_" + str(i)
+	dir0 = os.getcwd()
+	str1 = dir0 + "/out1/" + file + "_succeed_" + str(i)
+	fail_list = dir0 + '/out1/' + file + "_retry_" + str(i)
 	
 	while True:
 		domain = q.get()
@@ -121,13 +121,15 @@ def main(argv):
 			print("test.py -f <inputfile> -t <threadlimit>")
 	
 	time_start = time.time() 
-	dir = os.getcwd()
-	str0 = dir + '/input/' + file
+	dir0 = os.getcwd()
+	str0 = dir0 + '/input/' + file
 	print("\nPut the list into the queue")
+	total_lines = 0
 	with open(str0, 'r')as f:
 		for eachline in f:
 			domain = eachline.strip()
 			q.put(domain)
+			total_lines = total_lines + 1
 	time_end = time.time()
 	cost = time_end - time_start
 	print("\nQueued time cost:{}".format(cost))
@@ -138,8 +140,9 @@ def main(argv):
 	q.join()
 
 	
-	str1= dir + "/out1/" + file + "_succeed"
-	fail_list = dir + "/out1/" + file + "_retry"
+	str1= dir0 + "/out1/" + file + "_succeed"
+	fail_list = dir0 + "/out1/" + file + "_retry"
+	log = dir0 + '/out2/' + file + '.log'
 	#combine the files on each thread
 	timestamp = datetime.datetime.now().strftime('%m%d') 
 	#if not >300M , combine the succeed results
@@ -165,15 +168,17 @@ def main(argv):
 	time_end = time.time()
 	cost = time_end - time_start
 	print("\nVer1:Total time used to query: {}".format(cost))
+	with open(log, 'w') as flog:
+		flog.write("\nmywhois-V1: file {}, total lines: {}, total cost: {} s".format(file, total_lines, cost))
 	Clear(file,str0)
 
 
 
 def Clear(file, str0):
 	print("\n---clearing the temp files---")
-	dir = os.getcwd()
-	str1= dir + "/out1/" + file + "_succeed"
-	fail_list = dir + "/out1/" + file + "_retry"
+	dir0 = os.getcwd()
+	str1= dir0 + "/out1/" + file + "_succeed"
+	fail_list = dir0 + "/out1/" + file + "_retry"
 	for i in xrange(limit):
 		#if input file <300M , results combined,so del mid files 
 		if os.path.getsize(str0) < FileSize:
@@ -190,4 +195,4 @@ def Clear(file, str0):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+	main(sys.argv[1:])
